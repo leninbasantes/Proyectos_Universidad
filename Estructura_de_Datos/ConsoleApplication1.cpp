@@ -10,7 +10,8 @@ int main(){
     FILE* F2 = NULL;
     char archivo[] = "Discos";
     char modowb[] = "wb"; 
-    char modorb[] = "rb";	
+    char modorb[] = "rb";
+	int n;	
     for (;;) {
         switch (menuPrincipal()) {
         case '1':inicializar(F, archivo, modowb);
@@ -42,7 +43,13 @@ int main(){
             break;
         case '5': modificar(F);
         	system("cls");
+        
             break;
+        case'6':n=contarRegistros(F,archivo);
+        		ordMezclaDirecta(F, F1, F2, n); //Joyanes
+	            system("pause");
+	            system("cls");
+	        break;
         case '0': exit(0);
         }
     }

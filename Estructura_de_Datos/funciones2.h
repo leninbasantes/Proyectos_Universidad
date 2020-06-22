@@ -33,7 +33,7 @@ struct  discos {
 };
 
 char validarMenuPr(char opc){
-	while((opc!='1')&&(opc!='2')&&(opc!='3')&&(opc!='4')&&(opc!='5')&&(opc!='0')){
+	while((opc!='1')&&(opc!='2')&&(opc!='3')&&(opc!='4')&&(opc!='5')&&(opc!='6')&&(opc!='0')){
 		printf("Opcion incorrecta ingrese nuevamente : \n");
 		fflush(stdin);
 		scanf("%c",&opc);
@@ -49,6 +49,7 @@ char menuPrincipal(){
 	printf("\n3.- BUSCAR DISCO");
 	printf("\n4.- IMPRIMIR DISCOS");
 	printf("\n5.- MODIFICAR DISCO");
+	printf("\n6.- ORDENAMIENTO DE GENERO");
 	printf("\n0.- SALIR \n");
 	fflush(stdin);
 	scanf("%c",&opc);
@@ -164,6 +165,13 @@ FILE* abrir_archivo(char *nom_archivo, char *modo)
     }
     return F;
 }
+void inicializarOrd(FILE* F, char* archivo, char* modo)
+{
+    
+   F = abrir_archivo(archivo, modo);
+   fclose(F);
+   
+}
 void inicializar(FILE* F,char *archivo, char *modo)//crear archivos o si existe se borar y se regenera
 {
     char c;
@@ -196,7 +204,7 @@ int continuar()
 	}
 }
 int validarFecha(int fecha){
-	while((fecha<1900)||(fecha>2021)){
+	while((fecha<1900)||(fecha>=2020)){
 		printf("Incorrecto ingrese nuevamente :");
 		fflush(stdin);
         cin>>fecha;	
@@ -217,7 +225,7 @@ int codigoRepetido (FILE* F){
 	 return aux;
 }
 void ingresar(FILE* F)
-{	int cod=1;
+{
     discos datos;
     genero gene;
     char archivo[] = "Discos";
@@ -237,7 +245,7 @@ void ingresar(FILE* F)
         printf("Ingrese la Disquera: ");
         fflush(stdin);
         cin>>datos.disquera;
-        printf("Ingrese un anio superio a 1900 y inferior a 2021 : ");
+        printf("Ingrese un anio superio a 1900 y inferior a 2020 : ");
         cin>>datos.anio;
         validarFecha(datos.anio);
         printf("Ingrese el N. de canciones: ");
@@ -428,9 +436,9 @@ int validarfecha(FILE* F){
     printf("\nIngrese un anio  ");
      cin>>datos.anio;
     do {
-		if (datos.anio < 1900||datos.anio >=2021) {// revisar 
+		if (datos.anio < 1900||datos.anio >=2020) {// revisar 
            
-        printf("Ingrese un anio superio a 1900 y inferior a 2021 : ");
+        printf("Ingrese un anio superio a 1900 y inferior a 2020 : ");
         cin>>datos.anio;
         }
         else {
@@ -438,7 +446,7 @@ int validarfecha(FILE* F){
             system("pause");
         }
 
-    } while (datos.anio<1900 ||datos.anio >=2021); 	
+    } while (datos.anio<1900 ||datos.anio >=2020); 	
 	 fclose(F);
 	 return datos.anio;
 }
@@ -467,7 +475,6 @@ void modificar(FILE* F)
 			    printf("D : disquera  \n");
 			    printf("N : anio  \n");
 			    printf("S : numero de canciones \n");
-			 	printf("C : codigo \n");
 			 	printf("G : genero \n");
                 char opciones[] = "TADNSCG";
                 switch (opcion(opciones)) {
@@ -484,9 +491,6 @@ void modificar(FILE* F)
                     break;
                 case 'S': printf("Ingrese el numero de canciones   : ");
                     cin >> datos.numCanciones;
-                    break;
-                case 'C': printf("Ingrese el codigo  : ");
-                    cin >> datos.codigo;
                     break;
                 case 'G': 
 								
@@ -542,4 +546,152 @@ void modificar(FILE* F)
         system("pause");
     }
     fclose(F);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+void ordMezclaDirecta(FILE* F, FILE* F1, FILE* F2, int n) {
+    int i, j, lgtud;
+    bool sw, fin1, fin2;
+    char archivo[] = "Discos";
+    char archivo1[] = "F1";
+    char archivo2[] = "F2";
+    char modo[] = "rb";
+    char modo1[] = "wb";
+    char modo2[] = "rb+";
+    discos datos, datos1, datos2;
+    cout << "\nInicia el proceso de ordenamiento: \n";
+    system("pause");
+    lgtud = 1;
+    while (lgtud < n) {
+        //PARTICION
+        F = abrir_archivo(archivo, modo);
+        inicializarOrd(F1, archivo1, modo1);
+        inicializarOrd(F2, archivo2, modo1);
+        F1 = abrir_archivo(archivo1, modo2);
+        F2 = abrir_archivo(archivo2, modo2);
+        i = 0;
+        sw = true;
+        
+        if (fread(&datos, sizeof(discos), 1, F) != 1)
+            if (!feof(F))
+                printf("ERROR de lectura en el archivo.\n");
+        while (!feof(F)) {
+            if (sw) {
+                fseek(F1, 0, SEEK_END);
+                if (fwrite(&datos, sizeof(discos), 1, F1) != 1)
+                    printf("ERROR de escritura en el archivo.\n");
+            }
+            else
+            {
+                fseek(F2, 0, SEEK_END);
+                if (fwrite(&datos, sizeof(discos), 1, F2) != 1)
+                    printf("ERROR de escritura en el archivo.\n");
+            }
+            i++;
+            if (i == lgtud) {
+                sw = !sw;
+                i = 0;
+            }
+            if (fread(&datos, sizeof(discos), 1, F) != 1)
+                if (!feof(F))
+                    printf("ERROR de lectura en el archivo.\n");
+        }
+        fclose(F);
+        fclose(F1);
+        fclose(F2);
+        //FUSION
+        inicializarOrd(F, archivo, modo1);
+        F = abrir_archivo(archivo, modo2);
+        F1 = abrir_archivo(archivo1, modo);
+        F2 = abrir_archivo(archivo2, modo);
+        i = 0;
+        j = 0;
+        fin1 = false;
+        fin2 = false;
+        if (fread(&datos1, sizeof(discos), 1, F1) != 1) {
+            if (!feof(F1))
+                printf("ERROR de lectura en el archivo.\n");
+            fin1 = true;
+        }
+        if (fread(&datos2, sizeof(discos), 1, F2) != 1) {
+            if (!feof(F2))
+                printf("ERROR de lectura en el archivo.\n");
+            fin2 = true;
+        }
+
+        while (!fin1 || !fin2) {
+            while (!fin1 && !fin2 && i < lgtud && j < lgtud) {
+                if (strcmp(datos1.tipo_de_genero,datos2.tipo_de_genero)<0) {
+                    if (fwrite(&datos1, sizeof(discos), 1, F) != 1)
+                        printf("ERROR de escritura en el archivo.\n");
+                    if (fread(&datos1, sizeof(discos), 1, F1) != 1) {
+                        if (!feof(F1))
+                            printf("ERROR de lectura en el archivo.\n");
+                        fin1 = true;
+                    }
+                    i++; //F2
+                }
+                else {
+                    if (fwrite(&datos2, sizeof(discos), 1, F) != 1)
+                        printf("ERROR de escritura en el archivo.\n");
+                    if (fread(&datos2, sizeof(discos), 1, F2) != 1) {
+                        if (!feof(F2))
+                            printf("ERROR de lectura en el archivo.\n");
+                        fin2 = true;
+                    }
+                    j++; //F2
+                }
+            }
+            while (!fin1 && i < lgtud) {
+                if (fwrite(&datos1, sizeof(discos), 1, F) != 1)
+                    printf("ERROR de escritura en el archivo.\n");
+                if (fread(&datos1, sizeof(discos), 1, F1) != 1) {
+                    if (!feof(F1))
+                        printf("ERROR de lectura en el archivo.\n");
+                    fin1 = true;
+                }
+                i++;
+            }
+            while (!fin2 && j < lgtud) {
+                if (fwrite(&datos2, sizeof(discos), 1, F) != 1)
+                    printf("ERROR de escritura en el archivo.\n");
+                if (fread(&datos2, sizeof(discos), 1, F2) != 1) {
+                    if (!feof(F2))
+                        printf("ERROR de lectura en el archivo.\n");
+                    fin2 = true;
+                }
+                j++;
+            }
+            i = 0;
+            j = 0;
+        }
+        fclose(F);
+        fclose(F1);
+        fclose(F2);
+        lgtud = lgtud * 2;
+    }
+    cout << "\nProceso de ordenamiento Finalizado. \n";
+}
+
+
+int contarRegistros(FILE* F,char *archivo) {
+    discos datos;
+    int i = -1;
+    char modo[] = "rb";
+    F = abrir_archivo(archivo, modo);
+    do {
+        if (fread(&datos, sizeof(discos), 1, F) != 1)
+            if (!feof(F))
+                printf("ERROR de lectura en el archivo.\n");
+        i++;
+    } while (!feof(F));
+    fclose(F);
+    return i;
 }
