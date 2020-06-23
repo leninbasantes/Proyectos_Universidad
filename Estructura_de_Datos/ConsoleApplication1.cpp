@@ -40,10 +40,12 @@ int main(){
 					}
 				system("cls");	  
             break;
-        case '4': consulta_total(F,archivo,modorb);
+        case '4': 
+			consulta_total(F,archivo,modorb);
         	system("cls");
             break;
-        case '5': modificar(F);
+        case '5': 
+			modificar(F);
         	system("cls");
         
             break;

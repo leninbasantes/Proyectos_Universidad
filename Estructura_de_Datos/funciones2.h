@@ -8,8 +8,8 @@
 #include <cstdlib>
 
 using namespace std;
-char menuBusqueda();
 
+//Estructuras
 struct  genero {
 	char gene1[20] = "Rock";
 	char gene2[20] = "Salsa";
@@ -22,7 +22,6 @@ struct  genero {
 	char gene9[20] = "Otros";
 	
 };
-
 struct  discos {
     char artista[50];
     char titulo[50];
@@ -33,6 +32,73 @@ struct  discos {
     char tipo_de_genero[50];
 };
 
+
+//LLAMADA DE FUNCIONES
+char validarSN(char c);
+int validarFecha(int fecha);
+int validarfecha(FILE* F);
+char validarMenuPr(char opc);
+int continuar();
+void consulta(FILE* F);
+void consultaG(FILE* F);
+void consultaC(FILE* F);
+void consulta_total(FILE* F,char *archivo,char *modo);
+FILE* abrir_archivo(char *nom_archivo, char *modo);
+void inicializarOrd(FILE* F, char* archivo, char* modo);
+void inicializar(FILE* F,char *archivo, char *modo);
+void inicializar(FILE* F,char *archivo, char *modo);
+bool buscar(FILE* F, char * artista, discos* datos);
+bool buscarG(FILE* F, char * genero, discos* datos);
+bool buscar(FILE* F, int codigo , discos* datos);
+char menuPrincipal();
+char menuGenero();
+char menuBusqueda();
+void ordMezclaDirecta(FILE* F, FILE* F1, FILE* F2, int n);
+void ingresar(FILE* F);
+int contarRegistros(FILE* F,char *archivo); 
+int codigoRepetido (FILE* F);
+void mostrar_datos(discos datos);
+char opcion(char* opciones);
+//FIN LLAMADA DE FUNCIONES
+//VALIDACIONES
+char validarSN(char c){
+    while ((c != 's') && (c != 'n') && (c != 'S') && (c != 'N')) {
+        printf("Incorrecto, ingrese de nuevo: ");
+        fflush(stdin);
+        scanf("%c", &c);
+    }
+    return c;
+}
+int validarFecha(int fecha){
+	while((fecha<1900)||(fecha>=2020)){
+		printf("Incorrecto ingrese nuevamente :");
+		fflush(stdin);
+        cin>>fecha;	
+	}
+	return fecha;
+}
+int validarfecha(FILE* F){
+	discos datos;
+	char archivo[] = "Discos";
+    char modo[] = "rb";
+    F = abrir_archivo(archivo, modo);
+    printf("\nIngrese un anio  ");
+     cin>>datos.anio;
+    do {
+		if (datos.anio < 1900||datos.anio >=2020) {// revisar 
+           
+        printf("Ingrese un anio superio a 1900 y inferior a 2020 : ");
+        cin>>datos.anio;
+        }
+        else {
+            printf("\nAnio correcto\n\n");
+            system("pause");
+        }
+
+    } while (datos.anio<1900 ||datos.anio >=2020); 	
+	 fclose(F);
+	 return datos.anio;
+}
 char validarMenuPr(char opc){
 	while((opc!='1')&&(opc!='2')&&(opc!='3')&&(opc!='4')&&(opc!='5')&&(opc!='6')&&(opc!='0')){
 		printf("Opcion incorrecta ingrese nuevamente : \n");
@@ -41,155 +107,8 @@ char validarMenuPr(char opc){
 	}
 	return opc;
 }
+int continuar(){
 
-char menuPrincipal(){
-	char opc;
-	printf("\nBienvenido a la Tienda de Musica Cesarin");
-	printf("\n1.- INICIALIZAR ARCHIVO");
-	printf("\n2.- INSERTAR DISCO");
-	printf("\n3.- BUSCAR DISCO");
-	printf("\n4.- IMPRIMIR DISCOS");
-	printf("\n5.- MODIFICAR DISCO");
-	printf("\n6.- ORDENAMIENTO DE GENERO");
-	printf("\n0.- SALIR \n");
-	fflush(stdin);
-	scanf("%c",&opc);
-	opc=validarMenuPr(opc);
-	return (opc);
-}
-int menuGenero(){
-
-	int opc;
-	printf("Ingrese el genero que pertencer: ");
-        printf("\n1.- Rock : ");
-        printf("\n2.- Salsa:"); 
-        printf("\n3.- Bachata : ");
-        printf("\n4.- Romantica : ");
-        printf("\n5.- Merengue : ");
-        printf("\n6.- Pop : ");
-        printf("\n7.- Rock Indie : ");
-        printf("\n8.- Cumbia : ");
-        printf("\n9.- Otros :");
-		
-	fflush(stdin);
-	scanf("%d",&opc);
-	return (opc);
-}
-
-bool buscar(FILE* F, char * artista, discos* datos)
-{
-    discos aux_datos;
-    
-    bool esta = false;
-
-    rewind(F);
-    if (fread(&aux_datos, sizeof(discos), 1, F) != 1)
-        if (!feof(F))
-            printf("ERROR de lectura en el archivo.\n");
-    while (!feof(F)) {
-		if (!strcmp(artista, aux_datos.artista)) {
-            *datos = aux_datos;
-            esta = true;
-            break;
-        }
-        if (fread(&aux_datos, sizeof(discos), 1, F) != 1)
-            if (!feof(F))
-                printf("ERROR de lectura en el archivo.\n");
-    }
-
-    return esta;
-}
-bool buscarG(FILE* F, char * genero, discos* datos)
-{
-    discos aux_datos;
-    
-    bool esta = false;
-
-    rewind(F);
-    if (fread(&aux_datos, sizeof(discos), 1, F) != 1)
-        if (!feof(F))
-            printf("ERROR de lectura en el archivo.\n");
-    while (!feof(F)) {
-        if (!strcmp(genero, aux_datos.tipo_de_genero)) {
-            *datos = aux_datos;
-            esta = true;
-            break;
-        }
-        if (fread(&aux_datos, sizeof(discos), 1, F) != 1)
-            if (!feof(F))
-                printf("ERROR de lectura en el archivo.\n");
-    
-}
-
-    return esta;
-}
-bool buscar(FILE* F, int codigo , discos* datos)///////////////////////arregha
-{
-    discos aux_datos;
-    
-    bool esta = false;
-
-    rewind(F);
-    if (fread(&aux_datos, sizeof(discos), 1, F) != 1)
-        if (!feof(F))
-            printf("ERROR de lectura en el archivo.\n");
-    while (!feof(F)) {
-        if (codigo == aux_datos.codigo) {
-            *datos = aux_datos;
-            esta = true;
-            break;
-        }
-        if (fread(&aux_datos, sizeof(discos), 1, F) != 1)
-            if (!feof(F))
-                printf("ERROR de lectura en el archivo.\n");
-    }
-
-    return esta;
-}
-char validarSN(char c) 
-{
-    while ((c != 's') && (c != 'n') && (c != 'S') && (c != 'N')) {
-        printf("Incorrecto, ingrese de nuevo: ");
-        fflush(stdin);
-        scanf("%c", &c);
-    }
-    return c;
-}
-FILE* abrir_archivo(char *nom_archivo, char *modo)
-{
-    FILE* F;
-    F=fopen(nom_archivo, modo);
-
-    if (F == NULL) {
-        printf("No se puede abrir el archivo %s %s.\n",nom_archivo);
-        exit(1);
-    }
-    return F;
-}
-void inicializarOrd(FILE* F, char* archivo, char* modo)
-{
-    
-   F = abrir_archivo(archivo, modo);
-   fclose(F);
-   
-}
-void inicializar(FILE* F,char *archivo, char *modo)//crear archivos o si existe se borar y se regenera
-{
-    char c;
-	printf("\n\nCrea el archivo %s.\n",archivo);
-    printf("La informacion se pierde.\n");
-    cout<<"Desea continuar (S/N)? . ";
-    fflush(stdin);
-	scanf("%c",&c);
-	validarSN(c);
-	if((c=='s')||(c=='S')){
-		F=abrir_archivo(archivo, modo);
-	}else{
-		fclose(F);
-	}	
-}
-int continuar()
-{
     char c;
         printf("\nModificar:\n");
 		cout<<"Desea continuar (S/N)? . ";
@@ -204,118 +123,17 @@ int continuar()
 		return 1;
 	}
 }
-int validarFecha(int fecha){
-	while((fecha<1900)||(fecha>=2020)){
-		printf("Incorrecto ingrese nuevamente :");
+char validarMenuGenero(char opc){
+	while((opc!='1')&&(opc!='2')&&(opc!='3')&&(opc!='4')&&(opc!='5')&&(opc!='6')&&(opc!='7')&&(opc!='8')&&(opc!='9')){
+		printf("Opcion incorrecta ingrese nuevamente : \n");
 		fflush(stdin);
-        cin>>fecha;	
+		scanf("%c",&opc);
 	}
-	return fecha;
+	return opc;
 }
-int codigoRepetido (FILE* F){
-	int aux=1;
-	discos datos;
-    char archivo[] = "Discos";
-    char modo[] = "rb+";
-	 F = abrir_archivo(archivo, modo);
-	 
-	 while(buscar(F,aux,&datos)){
-	 	aux=datos.codigo;
-	 	aux++;
-	 }
-	 return aux;
-}
-void ingresar(FILE* F)
-{
-    discos datos;
-    genero gene;
-    char archivo[] = "Discos";
-    char modo[] = "rb+";
-    printf("\n\nIngreso de datos\n");
-    F = abrir_archivo(archivo, modo);
-    do {
-    	
-    	datos.codigo=codigoRepetido(F);
-    		  		
-    	printf("\nIngrese el Titulo: ");
-    	fflush(stdin);
-       	cin>>datos.titulo;
-        printf("Ingrese la Artista: ");
-        fflush(stdin);
-        cin>>datos.artista;
-        printf("Ingrese la Disquera: ");
-        fflush(stdin);
-        cin>>datos.disquera;
-        printf("Ingrese un anio superio a 1900 y inferior a 2020 : ");
-        cin>>datos.anio;
-        validarFecha(datos.anio);
-        printf("Ingrese el N. de canciones: ");
-        fflush(stdin);
-        cin>>datos.numCanciones;
-            
-			switch (menuGenero()) {
-		        case 1:
-					gene.gene1;
-					strcpy(datos.tipo_de_genero,gene.gene1);
-		            break;
-				case 2:
-					gene.gene2;
-					strcpy(datos.tipo_de_genero,gene.gene2);
-		            break;
-		        case 3:
-					gene.gene3;
-					strcpy(datos.tipo_de_genero,gene.gene3);
-					
-		            break;
-		        case 4:
-					gene.gene4;
-					strcpy(datos.tipo_de_genero,gene.gene4);
-		            break;
-		        case 5:
-					gene.gene5;
-					strcpy(datos.tipo_de_genero,gene.gene5);
-		            break;
-		        case 6:
-					gene.gene6;
-					strcpy(datos.tipo_de_genero,gene.gene6);
-					
-		            break;
-		        case 7:
-					gene.gene7;
-					strcpy(datos.tipo_de_genero,gene.gene7);
-		            break;
-		        case 8:
-					gene.gene8;
-					strcpy(datos.tipo_de_genero,gene.gene8);
-		            break;
-		        case 9:
-		        	gene.gene9;
-		        	strcpy(datos.tipo_de_genero,gene.gene9);
-			}
-        	
-            fseek(F, 0, SEEK_END);
-            if (fwrite(&datos, sizeof(discos), 1, F) != 1)
-                printf("ERROR de escritura en el archivo.\n");
-         
-    } while ((continuar)== !true); 
-    
-    printf("Ingrese el nombre con <ENTER> termina: ");
-    
-    fclose(F);
-}
-void mostrar_datos(discos datos)
-{
-    printf("\nTitulo : %s\n", datos.titulo);
-    printf("Artista : %s\n", datos.artista);
-    printf("Disquera: %s\n", datos.disquera);
- 	printf("Genero: %s\n", datos.tipo_de_genero);
-	printf("Anio   : %d\n", datos.anio);
-    printf("Numero de canciones: %d\n", datos.numCanciones);
- 	printf("Codigo : %d\n", datos.codigo);
- 
-}
-void consulta(FILE* F)
-{
+//CONSULTAS
+void consulta(FILE* F){
+
     discos datos;
     char Artista[31];
     char archivo[] = "Discos";
@@ -333,8 +151,8 @@ void consulta(FILE* F)
     system("pause");
     menuBusqueda();
 }
-void consultaG(FILE* F)
-{    
+void consultaG(FILE* F){ 
+   
     discos datos;
     char Genero[31];
     char archivo[] = "Discos";
@@ -352,8 +170,8 @@ void consultaG(FILE* F)
     system("pause");
     menuBusqueda();
 }
-void consultaC(FILE* F)
-{
+void consultaC(FILE* F){
+
     discos datos;
     int codigo;
     char archivo[] = "Discos";
@@ -370,31 +188,7 @@ void consultaC(FILE* F)
     fclose(F);
     system("pause");
 }
-char menuBusqueda()
-{
-    char opc;
-    fflush(stdin);
-    printf("Busqueda de discos\n\n\n");
-    printf("(1) Artista .\n");
-    printf("(2) Genero.\n");
-    printf("(3) Codigo.\n");
-    printf("(0) regresar.\n");
-  
-    printf("Elija una opcion. ");
-    fflush(stdin);
-	cin>>opc;
-    while((opc!='1')&&(opc!='2')&&(opc!='3')&&(opc!='0')){
-    	printf("no valido ingresa de nuevo");
-    	fflush(stdin);
-		cin>>opc;
-	}
-	if(opc=='0'){
-		menuPrincipal();
-	}else
-    return opc;   
-}
-void consulta_total(FILE* F,char *archivo,char *modo)
-{
+void consulta_total(FILE* F,char *archivo,char *modo){
     discos datos;
     int ord = 0;
     printf("\n\nConsulta total de la lista de discos.\n\n");
@@ -420,55 +214,180 @@ void consulta_total(FILE* F,char *archivo,char *modo)
     fclose(F);
     system("pause");
 }
-char opcion(char* opciones)
-{	
-    char s,t;
+//INICIALIZACION
+FILE* abrir_archivo(char *nom_archivo, char *modo){
 
+    FILE* F;
+    F=fopen(nom_archivo, modo);
+
+    if (F == NULL) {
+        printf("No se puede abrir el archivo %s %s.\n",nom_archivo);
+        exit(1);
+    }
+    return F;
+}
+void inicializarOrd(FILE* F, char* archivo, char* modo){
+
+
+    
+   F = abrir_archivo(archivo, modo);
+   fclose(F);
+   
+}
+void inicializar(FILE* F,char *archivo, char *modo){
+
+    char c;
+	printf("\n\nCrea el archivo %s.\n",archivo);
+    printf("La informacion se pierde.\n");
+    cout<<"Desea continuar (S/N)? . ";
+    fflush(stdin);
+	scanf("%c",&c);
+	validarSN(c);
+	if((c=='s')||(c=='S')){
+		F=abrir_archivo(archivo, modo);
+	}else{
+		fclose(F);
+	}	
+}
+//BUSCADORES
+bool buscar(FILE* F, char * artista, discos* datos){
+    discos aux_datos;
+    
+    bool esta = false;
+
+    rewind(F);
+    if (fread(&aux_datos, sizeof(discos), 1, F) != 1)
+        if (!feof(F))
+            printf("ERROR de lectura en el archivo.\n");
+    while (!feof(F)) {
+		if (!strcmp(artista, aux_datos.artista)) {
+            *datos = aux_datos;
+            esta = true;
+            break;
+        }
+        if (fread(&aux_datos, sizeof(discos), 1, F) != 1)
+            if (!feof(F))
+                printf("ERROR de lectura en el archivo.\n");
+    }
+
+    return esta;
+}
+bool buscarG(FILE* F, char * genero, discos* datos){
+    discos aux_datos;
+    
+    bool esta = false;
+
+    rewind(F);
+    if (fread(&aux_datos, sizeof(discos), 1, F) != 1)
+        if (!feof(F))
+            printf("ERROR de lectura en el archivo.\n");
+    while (!feof(F)) {
+        if (!strcmp(genero, aux_datos.tipo_de_genero)) {
+            *datos = aux_datos;
+            esta = true;
+            break;
+        }
+        if (fread(&aux_datos, sizeof(discos), 1, F) != 1)
+            if (!feof(F))
+                printf("ERROR de lectura en el archivo.\n");
+    
+}
+
+    return esta;
+}
+bool buscar(FILE* F, int codigo , discos* datos){
+    discos aux_datos;
+    
+    bool esta = false;
+
+    rewind(F);
+    if (fread(&aux_datos, sizeof(discos), 1, F) != 1)
+        if (!feof(F))
+            printf("ERROR de lectura en el archivo.\n");
+    while (!feof(F)) {
+        if (codigo == aux_datos.codigo) {
+            *datos = aux_datos;
+            esta = true;
+            break;
+        }
+        if (fread(&aux_datos, sizeof(discos), 1, F) != 1)
+            if (!feof(F))
+                printf("ERROR de lectura en el archivo.\n");
+    }
+
+    return esta;
+}
+//MENUS
+char menuPrincipal(){
+	char opc;
+	printf("\nBienvenido a la Tienda de Musica Cesarin");
+	printf("\n1.- INICIALIZAR ARCHIVO");
+	printf("\n2.- INSERTAR DISCO");
+	printf("\n3.- BUSCAR DISCO");
+	printf("\n4.- IMPRIMIR DISCOS");
+	printf("\n5.- MODIFICAR DISCO");
+	printf("\n6.- ORDENAMIENTO DE GENERO");
+	printf("\n0.- SALIR \n");
+	fflush(stdin);
+	scanf("%c",&opc);
+	opc=validarMenuPr(opc);
+	return (opc);
+}
+char menuGenero(){
+
+	char opc;
+	printf("Ingrese el genero que pertencer: ");
+        printf("\n1.- Rock : ");
+        printf("\n2.- Salsa:"); 
+        printf("\n3.- Bachata : ");
+        printf("\n4.- Romantica : ");
+        printf("\n5.- Merengue : ");
+        printf("\n6.- Pop : ");
+        printf("\n7.- Rock Indie : ");
+        printf("\n8.- Cumbia : ");
+        printf("\n9.- Otros :");
+	fflush(stdin);
+	scanf("%c",&opc);	
+	validarMenuGenero(opc);
+	return (opc);
+}
+char menuBusqueda(){
+    char opc;
+    fflush(stdin);
+    printf("Busqueda de discos\n\n\n");
+    printf("(1) Artista .\n");
+    printf("(2) Genero.\n");
+    printf("(3) Codigo.\n");
+    printf("(0) regresar.\n");
+  
     printf("Elija una opcion. ");
-    do {
-        cin>>s;
-        s=toupper(s);
-    } while (!strchr(opciones, s));
-    cout<<s<<endl;
-    return s;
+    fflush(stdin);
+	cin>>opc;
+    while((opc!='1')&&(opc!='2')&&(opc!='3')&&(opc!='0')){
+    	printf("no valido ingresa de nuevo");
+    	fflush(stdin);
+		cin>>opc;
+	}
+	if(opc=='0'){
+		menuPrincipal();
+	}else
+    return opc;   
 }
-int validarfecha(FILE* F){
-	discos datos;
-	char archivo[] = "Discos";
-    char modo[] = "rb";
-    F = abrir_archivo(archivo, modo);
-    printf("\nIngrese un anio  ");
-     cin>>datos.anio;
-    do {
-		if (datos.anio < 1900||datos.anio >=2020) {// revisar 
-           
-        printf("Ingrese un anio superio a 1900 y inferior a 2020 : ");
-        cin>>datos.anio;
-        }
-        else {
-            printf("\nAnio correcto\n\n");
-            system("pause");
-        }
-
-    } while (datos.anio<1900 ||datos.anio >=2020); 	
-	 fclose(F);
-	 return datos.anio;
-}
-void modificar(FILE* F)
-{
+//MODIFICACION 
+void modificar(FILE* F){
     int veri;
     genero gene;
 	discos datos;
-    char artista[31];
+  	int codigo;
     char archivo[] = "Discos";
     char modo[] = "rb+";
     printf("\n\nModifica una estructura.\n\n");
     F = abrir_archivo(archivo, modo);
-    printf("Ingrese el Artista: ");
-    cin>>artista;
+    printf("Ingrese el codigo: ");
+    cin>>codigo;
 
-    if (buscar(F, artista, &datos))
-        for (;;) {                            /* Para cambiar varios campos. */
+    if (buscar(F, codigo, &datos))
+        for (;;) {                            
             mostrar_datos(datos);
 			veri=continuar();
 			int opc;
@@ -480,7 +399,7 @@ void modificar(FILE* F)
 			    printf("N : anio  \n");
 			    printf("S : numero de canciones \n");
 			 	printf("G : genero \n");
-                char opciones[] = "TADNSCG";
+                char opciones[] = "TADNSG";
                 switch (opcion(opciones)) {
                 case 'T': printf("Ingrese el Titulo   : ");
                     cin>>datos.titulo;
@@ -546,12 +465,12 @@ void modificar(FILE* F)
             }
         }
     else {
-        printf("\nNo se encuentra el Artista.\n");
+        printf("\nNo se encuentra el codigo.\n");
         system("pause");
     }
     fclose(F);
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//ORDENAMIENTO
 void ordMezclaDirecta(FILE* F, FILE* F1, FILE* F2, int n) {
     int i, j, lgtud;
     bool sw, fin1, fin2;
@@ -632,7 +551,7 @@ void ordMezclaDirecta(FILE* F, FILE* F1, FILE* F2, int n) {
                             printf("ERROR de lectura en el archivo.\n");
                         fin1 = true;
                     }
-                    i++; //F2
+                    i++; 
                 }
                 else {
                     if (fwrite(&datos2, sizeof(discos), 1, F) != 1)
@@ -642,7 +561,7 @@ void ordMezclaDirecta(FILE* F, FILE* F1, FILE* F2, int n) {
                             printf("ERROR de lectura en el archivo.\n");
                         fin2 = true;
                     }
-                    j++; //F2
+                    j++; 
                 }
             }
             while (!fin1 && i < lgtud) {
@@ -675,6 +594,89 @@ void ordMezclaDirecta(FILE* F, FILE* F1, FILE* F2, int n) {
     }
     cout << "\nProceso de ordenamiento Finalizado. \n";
 }
+//INGRESO
+void ingresar(FILE* F){
+    discos datos;
+    genero gene;
+    char archivo[] = "Discos";
+    char modo[] = "rb+";
+    printf("\n\nIngreso de datos\n");
+    F = abrir_archivo(archivo, modo);
+    do {
+    	
+    	datos.codigo=codigoRepetido(F);
+    		  		
+    	printf("\nIngrese el Titulo: ");
+    	fflush(stdin);
+       	cin>>datos.titulo;
+       	fflush(stdin);
+        printf("Ingrese la Artista: ");
+        fflush(stdin);
+        cin>>datos.artista;
+        fflush(stdin);
+        printf("Ingrese la Disquera: ");
+        fflush(stdin);
+        cin>>datos.disquera;
+        fflush(stdin);
+        printf("Ingrese un anio superio a 1900 y inferior a 2020 : ");
+        cin>>datos.anio;
+        validarFecha(datos.anio);
+        fflush(stdin);
+        printf("Ingrese el N. de canciones: ");
+        fflush(stdin);
+        cin>>datos.numCanciones;
+            
+			switch (menuGenero()) {
+		        case '1':
+					gene.gene1;
+					strcpy(datos.tipo_de_genero,gene.gene1);
+		            break;
+				case '2':
+					gene.gene2;
+					strcpy(datos.tipo_de_genero,gene.gene2);
+		            break;
+		        case '3':
+					gene.gene3;
+					strcpy(datos.tipo_de_genero,gene.gene3);
+					
+		            break;
+		        case '4':
+					gene.gene4;
+					strcpy(datos.tipo_de_genero,gene.gene4);
+		            break;
+		        case '5':
+					gene.gene5;
+					strcpy(datos.tipo_de_genero,gene.gene5);
+		            break;
+		        case '6':
+					gene.gene6;
+					strcpy(datos.tipo_de_genero,gene.gene6);
+					
+		            break;
+		        case '7':
+					gene.gene7;
+					strcpy(datos.tipo_de_genero,gene.gene7);
+		            break;
+		        case '8':
+					gene.gene8;
+					strcpy(datos.tipo_de_genero,gene.gene8);
+		            break;
+		        case '9':
+		        	gene.gene9;
+		        	strcpy(datos.tipo_de_genero,gene.gene9);
+			}
+        	
+            fseek(F, 0, SEEK_END);
+            if (fwrite(&datos, sizeof(discos), 1, F) != 1)
+                printf("ERROR de escritura en el archivo.\n");
+         
+    } while ((continuar)== !true); 
+    
+    printf("Ingrese el nombre con <ENTER> termina: ");
+    
+    fclose(F);
+}
+//CONTAR REGISTROS
 int contarRegistros(FILE* F,char *archivo) {
     discos datos;
     int i = -1;
@@ -689,3 +691,44 @@ int contarRegistros(FILE* F,char *archivo) {
     fclose(F);
     return i;
 }
+//CODIGO REPETIDO
+int codigoRepetido (FILE* F){
+	int aux=1;
+	discos datos;
+    char archivo[] = "Discos";
+    char modo[] = "rb+";
+	 F = abrir_archivo(archivo, modo);
+	 
+	 while(buscar(F,aux,&datos)){
+	 	aux=datos.codigo;
+	 	aux++;
+	 }
+	 return aux;
+}
+//MOSTRAR DATOS
+void mostrar_datos(discos datos){
+    printf("\nTitulo : %s\n", datos.titulo);
+    printf("Artista : %s\n", datos.artista);
+    printf("Disquera: %s\n", datos.disquera);
+ 	printf("Genero: %s\n", datos.tipo_de_genero);
+	printf("Anio   : %d\n", datos.anio);
+    printf("Numero de canciones: %d\n", datos.numCanciones);
+ 	printf("Codigo : %d\n", datos.codigo);
+ 
+}
+char opcion(char* opciones){	
+    char s,t;
+
+    printf("Elija una opcion. ");
+    do {
+        cin>>s;
+        s=toupper(s);
+    } while (!strchr(opciones, s));
+    cout<<s<<endl;
+    return s;
+}
+
+
+
+
+
