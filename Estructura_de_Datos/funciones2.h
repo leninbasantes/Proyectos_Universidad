@@ -19,6 +19,7 @@ struct  genero {
 	char gene6[20] = "Pop";
 	char gene7[30] = "Rock Indie";
 	char gene8[20] = "Cumbia";
+	char gene9[20] = "Otros";
 	
 };
 
@@ -68,6 +69,7 @@ int menuGenero(){
         printf("\n6.- Pop : ");
         printf("\n7.- Rock Indie : ");
         printf("\n8.- Cumbia : ");
+        printf("\n9.- Otros :");
 		
 	fflush(stdin);
 	scanf("%d",&opc);
@@ -108,13 +110,12 @@ bool buscarG(FILE* F, char * genero, discos* datos)
         if (!feof(F))
             printf("ERROR de lectura en el archivo.\n");
     while (!feof(F)) {
-    	if (genero!=aux_datos.tipo_de_genero){
-       // if (!strcmp(genero, aux_datos.tipo_de_genero)) {
+        if (!strcmp(genero, aux_datos.tipo_de_genero)) {
             *datos = aux_datos;
             esta = true;
             break;
         }
-        if (fread(&aux_datos, sizeof(genero), 1, F) != 1)
+        if (fread(&aux_datos, sizeof(discos), 1, F) != 1)
             if (!feof(F))
                 printf("ERROR de lectura en el archivo.\n");
     
@@ -287,6 +288,9 @@ void ingresar(FILE* F)
 					gene.gene8;
 					strcpy(datos.tipo_de_genero,gene.gene8);
 		            break;
+		        case 9:
+		        	gene.gene9;
+		        	strcpy(datos.tipo_de_genero,gene.gene9);
 			}
         	
             fseek(F, 0, SEEK_END);
@@ -330,7 +334,7 @@ void consulta(FILE* F)
     menuBusqueda();
 }
 void consultaG(FILE* F)
-{
+{    
     discos datos;
     char Genero[31];
     char archivo[] = "Discos";
@@ -341,7 +345,7 @@ void consultaG(FILE* F)
     cin>>Genero;
     
     if (buscarG(F, Genero , &datos))
-			mostrar_datos(datos);
+        mostrar_datos(datos);
     else
         printf("\nNo se encuentra este artista.\n");
     fclose(F);
@@ -547,15 +551,7 @@ void modificar(FILE* F)
     }
     fclose(F);
 }
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
 void ordMezclaDirecta(FILE* F, FILE* F1, FILE* F2, int n) {
     int i, j, lgtud;
     bool sw, fin1, fin2;
@@ -679,8 +675,6 @@ void ordMezclaDirecta(FILE* F, FILE* F1, FILE* F2, int n) {
     }
     cout << "\nProceso de ordenamiento Finalizado. \n";
 }
-
-
 int contarRegistros(FILE* F,char *archivo) {
     discos datos;
     int i = -1;

@@ -16,13 +16,14 @@ int main(){
         switch (menuPrincipal()) {
         case '1':inicializar(F, archivo, modowb);
             system("cls");
-            break;
+            break;	
         case '2': (ingresar(F));
         	system("cls");
             break;
         case '3': 					
 			switch (menuBusqueda()){
-        		case '1': system("cls");
+        		case '1': 
+					system("cls");
 					consulta(F);
 		            system("cls");
 		           	break;
@@ -34,7 +35,8 @@ int main(){
 					consultaC(F);
 			        system("cls");
 		            break;
-		        case '0': menuPrincipal();
+		        case '0': exit(0);
+		        system("cls");
 					}
 				system("cls");	  
             break;
@@ -45,10 +47,11 @@ int main(){
         	system("cls");
         
             break;
-        case'6':n=contarRegistros(F,archivo);
-        		ordMezclaDirecta(F, F1, F2, n); //Joyanes
-	            system("pause");
-	            system("cls");
+        case'6':
+			n=contarRegistros(F,archivo);
+        	ordMezclaDirecta(F, F1, F2, n); //Joyanes
+	        system("pause");
+	        system("cls");
 	        break;
         case '0': exit(0);
         }
